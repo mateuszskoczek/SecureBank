@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "SecureBank.API": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

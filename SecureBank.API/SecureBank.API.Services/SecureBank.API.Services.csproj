@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\SecureBank.Common\SecureBank.Common.csproj" />
+    <ProjectReference Include="..\..\SecureBank.Database\SecureBank.Database.csproj" />
+    <ProjectReference Include="..\..\SecureBank.Extensions\SecureBank.Extensions.csproj" />
+    <ProjectReference Include="..\SecureBank.API.Authentication\SecureBank.API.Authentication.csproj" />
+    <ProjectReference Include="..\SecureBank.API.Helpers\SecureBank.API.Helpers.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,133 @@
+﻿@page "/admin/create-account"
+
+<h3>Create new client account</h3>
+
+@if (_id is null)
+{
+    <EditForm Model="@_data" OnSubmit="Submit">
+        <div class="form-group">
+            <label for="first-name-input">
+                First name:
+            </label>
+            <InputText id="first-name-input" class="form-control" @bind-Value="@_data.FirstName"></InputText>
+        </div>
+        <div class="form-group">
+            <label for="last-name-input">
+                Last name:
+            </label>
+            <InputText id="last-name-input" class="form-control" @bind-Value="@_data.LastName"></InputText>
+        </div>
+        <div class="form-group">
+            <label for="email-input">
+                Email address:
+            </label>
+            <InputText id="email-input" class="form-control" @bind-Value="@_data.Email"></InputText>
+        </div>
+        <div class="form-group">
+            <label for="phone-number-input">
+                Phone number:
+            </label>
+            <InputText id="phone-number-input" class="form-control" @bind-Value="@_data.PhoneNumber"></InputText>
+        </div>
+        <br />
+        <button class="btn btn-primary" type="submit">Submit</button>
+        @if (!string.IsNullOrWhiteSpace(_message))
+        {
+            <p class="text-red">Error: @_message</p>
+        }
+    </EditForm>
+}
+else
+{
+    <p><strong>New client account was created</strong></p>
+    <table>
+        <tr>
+            <td><strong>Client code:</strong></td>
+            <td>@($"{_id:00000000}")</td>
+        </tr>
+        <tr>
+            <td><strong>First name:</strong></td>
+            <td>@_data.FirstName</td>
+        </tr>
+        <tr>
+            <td><strong>Last name:</strong></td>
+            <td>@_data.LastName</td>
+        </tr>
+        <tr>
+            <td><strong>Email:</strong></td>
+            <td>@_data.Email</td>
+        </tr>
+        <tr>
+            <td><strong>Phone number:</strong></td>
+            <td>@_data.PhoneNumber</td>
+        </tr>
+        <tr>
+            <td><strong>Password:</strong></td>
+            <td>******** (Information passed on to the client - LOG)</td>
+        </tr>
+    </table>
+    <br/>
+    <button class="btn btn-secondary" @onclick="NavigateToAdminPanel">Go back to admin panel</button>
+    <button class="btn btn-primary" @onclick="NavigateToNewForm">Create next account</button>
+
+}
+
+@code {
+    #region SERVICES
+
+    [Inject]
+    protected IAccountsService _accountsService { get; set; }
+
+    [Inject]
+    protected NavigationManager _navigationManager { get; set; }
+
+    #endregion
+
+
+
+    #region FIELDS
+
+    protected CreateAccountRequest _data;
+
+    protected int? _id;
+
+    protected string? _message;
+
+    #endregion
+
+
+
+    #region METHODS
+
+    protected override void OnInitialized()
+    {
+        _data = new CreateAccountRequest();
+        _id = null;
+        _message = null;
+    }
+
+    protected async Task Submit()
+    {
+        APIResponse<int> response = await _accountsService.CreateAccount(_data);
+        if (response.Success)
+        {
+            _id = response.Data;
+        }
+        else
+        {
+            _message = response.Message;
+        }
+    }
+
+    protected void NavigateToNewForm()
+    {
+        OnInitialized();
+    }
+
+    protected void NavigateToAdminPanel()
+    {
+        _navigationManager.NavigateTo("/"); //TODO: Zmienić na /admin
+    }
+
+    #endregion
+}
