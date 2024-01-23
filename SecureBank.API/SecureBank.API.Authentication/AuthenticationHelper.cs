@@ -36,7 +36,7 @@ namespace SecureBank.API.Authentication
 
         #region METHODS
 
-        public string GenerateToken(Guid tokenId, int accountId, bool oneTimeToken = false)
+        public string GenerateToken(Guid tokenId, Account account, bool oneTimeToken = false)
         {
             DateTime expirationTime = DateTime.UtcNow.AddMinutes(_configuration.TokenLifetime);
 
@@ -44,11 +44,13 @@ namespace SecureBank.API.Authentication
             {
                 Subject = new ClaimsIdentity(new List<Claim>
                 {
-                    new Claim(JwtRegisteredClaimNames.Jti, tokenId.ToString()),
-                    new Claim(JwtRegisteredClaimNames.Sub, accountId.ToString()),
-                    new Claim(JwtRegisteredClaimNames.Exp, expirationTime.ToString()),
+                    new Claim("jti", tokenId.ToString()),
+                    new Claim("uid", account.Id.ToString()),
+                    new Claim("first_name", account.FirstName),
+                    new Claim("last_name", account.LastName),
+                    new Claim("exp", expirationTime.ToString()),
                     new Claim("one_time_token", oneTimeToken.ToString()),
-                    new Claim("admin", "false"), //TODO: w zależności od użytkownika
+                    new Claim("admin", account.IsAdmin.ToString()),
                 }),
                 Expires = expirationTime,
                 Issuer = _configuration.TokenIssuer,

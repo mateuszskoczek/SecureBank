@@ -2,72 +2,117 @@
 
 <h3>Login</h3>
 
-@if (!_clientCodeAccepted)
+
+@switch (_state)
 {
-    <p>Enter your client code:</p>
+    case AuthState.CodeInput:
+        <p>Enter your client code:</p>
 
-    <form>
-        <InputText @bind-Value="_clientCodeArr[0]" class="single-input" data-index="1" maxlength="1" required></InputText>
-        <InputText @bind-Value="_clientCodeArr[1]" class="single-input" data-index="2" maxlength="1" required></InputText>
-        <InputText @bind-Value="_clientCodeArr[2]" class="single-input" data-index="3" maxlength="1" required></InputText>
-        <InputText @bind-Value="_clientCodeArr[3]" class="single-input" data-index="4" maxlength="1" required></InputText>
-        <InputText @bind-Value="_clientCodeArr[4]" class="single-input" data-index="5" maxlength="1" required></InputText>
-        <InputText @bind-Value="_clientCodeArr[5]" class="single-input" data-index="6" maxlength="1" required></InputText>
-        <InputText @bind-Value="_clientCodeArr[6]" class="single-input" data-index="7" maxlength="1" required></InputText>
-        <InputText @bind-Value="_clientCodeArr[7]" class="single-input" data-index="8" maxlength="1" required></InputText>
-    </form>
-    <br />
-    <button type="submit" class="btn btn-primary" @onclick="SubmitClientCode">Next</button>
-    <br/>
-    <br/>
-    @if (!string.IsNullOrWhiteSpace(_clientCodeMessage))
-    {
-        <p class="text-red">Error: @_clientCodeMessage</p>
-    }
+        <form>
+            <InputText @bind-Value="_clientCodeArr[0]" class="single-input" data-index="1" maxlength="1" required></InputText>
+            <InputText @bind-Value="_clientCodeArr[1]" class="single-input" data-index="2" maxlength="1" required></InputText>
+            <InputText @bind-Value="_clientCodeArr[2]" class="single-input" data-index="3" maxlength="1" required></InputText>
+            <InputText @bind-Value="_clientCodeArr[3]" class="single-input" data-index="4" maxlength="1" required></InputText>
+            <InputText @bind-Value="_clientCodeArr[4]" class="single-input" data-index="5" maxlength="1" required></InputText>
+            <InputText @bind-Value="_clientCodeArr[5]" class="single-input" data-index="6" maxlength="1" required></InputText>
+            <InputText @bind-Value="_clientCodeArr[6]" class="single-input" data-index="7" maxlength="1" required></InputText>
+            <InputText @bind-Value="_clientCodeArr[7]" class="single-input" data-index="8" maxlength="1" required></InputText>
+        </form>
+        <br />
+        <button type="submit" class="btn btn-primary" @onclick="SubmitClientCode">Next</button>
+        <br />
+        <br />
+        break;
+    case AuthState.PasswordInput:
+        <p>Enter your password:</p>
+
+        <form>
+            <InputText type="password" @bind-Value="_clientPasswordArr[0]" class="single-input" data-index="1" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(0))"></InputText>
+            <InputText type="password" @bind-Value="_clientPasswordArr[1]" class="single-input" data-index="2" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(1))"></InputText>
+            <InputText type="password" @bind-Value="_clientPasswordArr[2]" class="single-input" data-index="3" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(2))"></InputText>
+            <InputText type="password" @bind-Value="_clientPasswordArr[3]" class="single-input" data-index="4" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(3))"></InputText>
+            <InputText type="password" @bind-Value="_clientPasswordArr[4]" class="single-input" data-index="5" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(4))"></InputText>
+            <InputText type="password" @bind-Value="_clientPasswordArr[5]" class="single-input" data-index="6" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(5))"></InputText>
+            <InputText type="password" @bind-Value="_clientPasswordArr[6]" class="single-input" data-index="7" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(6))"></InputText>
+            <InputText type="password" @bind-Value="_clientPasswordArr[7]" class="single-input" data-index="8" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(7))"></InputText>
+            <InputText type="password" @bind-Value="_clientPasswordArr[8]" class="single-input" data-index="9" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(8))"></InputText>
+            <InputText type="password" @bind-Value="_clientPasswordArr[9]" class="single-input" data-index="10" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(9))"></InputText>
+            <InputText type="password" @bind-Value="_clientPasswordArr[10]" class="single-input" data-index="11" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(10))"></InputText>
+            <InputText type="password" @bind-Value="_clientPasswordArr[11]" class="single-input" data-index="12" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(11))"></InputText>
+            <InputText type="password" @bind-Value="_clientPasswordArr[12]" class="single-input" data-index="13" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(12))"></InputText>
+            <InputText type="password" @bind-Value="_clientPasswordArr[13]" class="single-input" data-index="14" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(13))"></InputText>
+            <InputText type="password" @bind-Value="_clientPasswordArr[14]" class="single-input" data-index="15" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(14))"></InputText>
+            <InputText type="password" @bind-Value="_clientPasswordArr[15]" class="single-input" data-index="16" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(15))"></InputText>
+            <InputText type="password" @bind-Value="_clientPasswordArr[16]" class="single-input" data-index="17" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(16))"></InputText>
+            <InputText type="password" @bind-Value="_clientPasswordArr[17]" class="single-input" data-index="18" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(17))"></InputText>
+            <InputText type="password" @bind-Value="_clientPasswordArr[18]" class="single-input" data-index="19" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(18))"></InputText>
+            <InputText type="password" @bind-Value="_clientPasswordArr[19]" class="single-input" data-index="20" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(19))"></InputText>
+        </form>
+        <br />
+        <button class="btn" @onclick="OnInitialized">Back</button>
+        <button type="submit" class="btn btn-primary" @onclick="SubmitClientPassword">Submit</button>
+        break;
+    case AuthState.PasswordChange:
+        <p>Change temporary password:</p>
+        <form>
+            <div class="form-group">
+                <label for="password1-input">
+                    Password:
+                </label>
+                <InputText id="password1-input" class="form-control" type="password" @bind-Value="_password1" data-index="1" minlength="8" maxlength="20"></InputText>
+            </div>
+            <div class="form-group">
+                <label for="password2-input">
+                    Confirm password:
+                </label>
+                <InputText id="password2-input" class="form-control" type="password" @bind-Value="_password2" data-index="1" minlength="8" maxlength="20"></InputText>
+            </div>
+        </form>
+        <br/>
+        <button class="btn" @onclick="OnInitialized">Back</button>
+        <button type="submit" class="btn btn-primary" @onclick="SubmitChangePassword">Submit</button>
+        break;
 }
-else
+
+@if (!string.IsNullOrWhiteSpace(_messageError))
 {
-    <p>Enter your password:</p>
-
-    <form>
-        <InputText type="password" @bind-Value="_clientPasswordArr[0]" class="single-input" data-index="1" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(0))"></InputText>
-        <InputText type="password" @bind-Value="_clientPasswordArr[1]" class="single-input" data-index="2" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(1))"></InputText>
-        <InputText type="password" @bind-Value="_clientPasswordArr[2]" class="single-input" data-index="3" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(2))"></InputText>
-        <InputText type="password" @bind-Value="_clientPasswordArr[3]" class="single-input" data-index="4" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(3))"></InputText>
-        <InputText type="password" @bind-Value="_clientPasswordArr[4]" class="single-input" data-index="5" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(4))"></InputText>
-        <InputText type="password" @bind-Value="_clientPasswordArr[5]" class="single-input" data-index="6" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(5))"></InputText>
-        <InputText type="password" @bind-Value="_clientPasswordArr[6]" class="single-input" data-index="7" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(6))"></InputText>
-        <InputText type="password" @bind-Value="_clientPasswordArr[7]" class="single-input" data-index="8" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(7))"></InputText>
-        <InputText type="password" @bind-Value="_clientPasswordArr[8]" class="single-input" data-index="9" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(8))"></InputText>
-        <InputText type="password" @bind-Value="_clientPasswordArr[9]" class="single-input" data-index="10" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(9))"></InputText>
-        <InputText type="password" @bind-Value="_clientPasswordArr[10]" class="single-input" data-index="11" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(10))"></InputText>
-        <InputText type="password" @bind-Value="_clientPasswordArr[11]" class="single-input" data-index="12" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(11))"></InputText>
-        <InputText type="password" @bind-Value="_clientPasswordArr[12]" class="single-input" data-index="13" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(12))"></InputText>
-        <InputText type="password" @bind-Value="_clientPasswordArr[13]" class="single-input" data-index="14" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(13))"></InputText>
-        <InputText type="password" @bind-Value="_clientPasswordArr[14]" class="single-input" data-index="15" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(14))"></InputText>
-        <InputText type="password" @bind-Value="_clientPasswordArr[15]" class="single-input" data-index="16" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(15))"></InputText>
-        <InputText type="password" @bind-Value="_clientPasswordArr[16]" class="single-input" data-index="17" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(16))"></InputText>
-        <InputText type="password" @bind-Value="_clientPasswordArr[17]" class="single-input" data-index="18" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(17))"></InputText>
-        <InputText type="password" @bind-Value="_clientPasswordArr[18]" class="single-input" data-index="19" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(18))"></InputText>
-        <InputText type="password" @bind-Value="_clientPasswordArr[19]" class="single-input" data-index="20" maxlength="1" disabled="@(!_loginRequest?.Indexes.Contains(19))"></InputText>
-    </form>
-    <br />
-    <button class="btn" @onclick="OnInitialized">Back</button>
-    <button type="submit" class="btn btn-primary" @onclick="SubmitClientPassword">Submit</button>
-    @if (!string.IsNullOrWhiteSpace(_clientPasswordMessage))
-    {
-        <p class="text-red">Error: @_clientPasswordMessage</p>
-    }
+    <p class="text-red">Error: @_messageError</p>
 }
 
+@if (!string.IsNullOrWhiteSpace(_messageSuccess))
+{
+    <p class="text-green">@_messageSuccess</p>
+}
 
 
 
 @code {
+    #region ENUMS
+
+    protected enum AuthState
+    {
+        CodeInput,
+        PasswordInput,
+        PasswordChange
+    }
+
+    #endregion
+
+
+
     #region SERVICES
 
     [Inject]
     protected IAccountsService _accountService { get; set; }
+
+    [Inject]
+    protected AuthenticationHelper _authenticationHelper { get; set; }
+
+    [Inject]
+    protected NavigationManager _navigationManager { get; set; }
+
+    [Inject]
+    protected HttpClient _httpClient { get; set; }
 
     #endregion
 
@@ -75,20 +120,23 @@ else
 
     #region FIELDS
 
-    protected bool _clientCodeAccepted;
+    protected AuthState _state;
 
-    protected string? _clientCodeMessage;
+    protected string? _messageError;
+    protected string? _messageSuccess;
 
     protected string[] _clientCodeArr;
     protected string _clientCode => string.Join(string.Empty, _clientCodeArr);
 
     protected string[] _clientPasswordArr;
     protected string _clientPassword => string.Join(string.Empty, _clientPasswordArr);
-    protected byte _clientPasswordFailCount;
-
-    protected string? _clientPasswordMessage;
 
     protected GetPasswordVariantResponse? _loginRequest;
+
+    protected int _accountId;
+
+    protected string _password1;
+    protected string _password2;
 
     #endregion
 
@@ -98,53 +146,116 @@ else
 
     protected override void OnInitialized()
     {
-        _clientCodeAccepted = false;
-        _clientCodeMessage = null;
+        _state = AuthState.CodeInput;
+        _messageError = null;
+        _messageSuccess = null;
         _clientCodeArr = new string[8];
         _clientPasswordArr = new string[20];
-        _clientPasswordMessage = null;
         _loginRequest = null;
+        _accountId = 0;
+        _password1 = string.Empty;
+        _password2 = string.Empty;
     }
 
     protected async void SubmitClientCode()
     {
-        if (_clientCode.Length == 8 && int.TryParse(_clientCode, out int accountId))
+        if (_clientCode.Length == 8 && int.TryParse(_clientCode, out _accountId))
         {
-            APIResponse<GetPasswordVariantResponse> loginRequest = await _accountService.GetPasswordVariant(accountId);
+            APIResponse<GetPasswordVariantResponse> loginRequest = await _accountService.GetPasswordVariant(_accountId);
 
-            if (loginRequest.Success)
+            if (loginRequest.Status == ResponseStatus.Ok)
             {
                 if (loginRequest.Data.ValidTo < DateTime.Now)
                 {
-                    _clientCodeMessage = "Your login request has already expired. Check your internet connection";
+                    _messageError = "Your login request has already expired. Check your internet connection";
                 }
                 else
                 {
-                    _clientCodeAccepted = true;
+                    _state = AuthState.PasswordInput;
                     _loginRequest = loginRequest.Data;
+                    _messageError = null;
                 }
             }
             else
             {
-                _clientCodeMessage = loginRequest.Message;
+                _messageError = loginRequest.Message;
             }
         }
         else
         {
-            _clientCodeMessage = "Wrong client code format";
+            _messageError = "Wrong client code format";
         }
         StateHasChanged();
     }
 
-    protected void SubmitClientPassword()
+    protected async Task SubmitClientPassword()
     {
         if (_clientPassword.Length == _loginRequest.Indexes.Length)
         {
+            AuthenticationRequest requestData = new AuthenticationRequest
+            {
+                LoginRequestId = _loginRequest.LoginRequestId,
+                Password = _clientPassword,
+            };
 
+            APIResponse<string> response = await _accountService.Authentication(_accountId, requestData);
+
+            if (response.Status == ResponseStatus.Ok)
+            {
+                if (response.ActionCode == 2)
+                {
+                    _httpClient.DefaultRequestHeaders.Authorization =  new AuthenticationHeaderValue("Bearer", response.Data);
+                    _state = AuthState.PasswordChange;
+                }
+                else
+                {
+                    await _authenticationHelper.SaveToken(response.Data);
+                    _messageSuccess = "Login succedeed. You will be redirected in 5 seconds";
+                    StateHasChanged();
+                    await Task.Delay(5000);
+                    _navigationManager.NavigateTo("/", true);
+                }
+            }
+            else
+            {
+                switch (response.ActionCode)
+                {
+                    case 1: OnInitialized(); StateHasChanged(); break;
+                }
+                _messageError = response.Message;
+            }
         }
         else
         {
-            _clientPasswordMessage = "Not all fields were filled";
+            _messageError = "Not all fields were filled";
+        }
+        StateHasChanged();
+    }
+
+    protected async Task SubmitChangePassword()
+    {
+        if (string.Equals(_password1, _password2))
+        {
+            ChangePasswordRequest data = new ChangePasswordRequest { Password = _password1 };
+            APIResponse response = await _accountService.ChangePassword(data);
+            if (response.Status == ResponseStatus.Ok)
+            {
+                _messageError = null;
+                _messageSuccess = "Password has been changed. Please, login again. You will be redirected in 5 seconds";
+                StateHasChanged();
+                Task redirectionTimer = Task.Delay(5000);
+                _httpClient.DefaultRequestHeaders.Authorization = null;
+                await redirectionTimer;
+                OnInitialized();
+            }
+            else
+            {
+                _messageError = response.Message;
+            }
+        }
+        else
+        {
+            _messageError = "Password fields does not match";
         }
     }
 

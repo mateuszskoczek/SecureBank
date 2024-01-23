@@ -1,0 +1,70 @@
+﻿@page "/admin"
+
+<h3>Admin panel</h3>
+
+@if (_authLoaded)
+{
+    @if (_claims is not null && _claims.IsAdmin)
+    {
+        <ul>
+            <li><a href="/admin/create-account">Create new account</a></li>
+            <li><a href="/admin/create-transfer">Create new transfer</a></li>
+            <li><a href="/admin/accounts-management">Accounts management</a></li>
+        </ul>
+    }
+    else
+    {
+        <p>You do not have permission to view this page</p>
+        <a href="/">Click here to redirect to main page</a>
+    }
+}
+else
+{
+    <p>Waiting for authorization...</p>
+}
+
+
+@code {
+    #region SERVICES
+
+    [Inject]
+    protected TokenAuthenticationStateProvider _authenticationStateProvider { get; set; }
+
+    #endregion
+
+
+
+    #region FIELDS
+
+    protected Claims? _claims;
+
+    protected bool _authLoaded;
+
+    #endregion
+
+
+
+    #region METHODS
+
+    protected override void OnInitialized()
+    {
+        _claims = null;
+        _authLoaded = false;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            AuthenticationState state = await _authenticationStateProvider.GetAuthenticationStateAsync();
+            if (state.User.Claims.Any())
+            {
+                _claims = new Claims(state.User.Claims);
+            }
+            _authLoaded = true;
+            StateHasChanged();
+        }
+    }
+
+    #endregion
+}

@@ -1,0 +1,152 @@
+﻿@page "/dashboard"
+
+<h3>Dashboard</h3>
+
+@if (_authLoaded)
+{
+    @if (_claims is not null)
+    {
+        @switch (_dataLoadedState)
+        {
+            case DataLoadState.Loading:
+                <p>Waiting for data...</p>
+                break;
+            case DataLoadState.NotLoaded:
+                <p>Data cannot be loaded. Try again later.</p>
+                <a href="/">Click here to redirect to main page</a>
+                break;
+            case DataLoadState.Loaded:
+                <h5>Account balance:</h5>
+                <p class="text-big">@($"{_balance:F2} PLN")</p>
+                <h5>Operation history:</h5>
+                <table class="table-brd">
+                    <tr>
+                        <th class="table-brd">Date</th>
+                        <th class="table-brd">Title</th>
+                        <th class="table-brd">Amount</th>
+                    </tr>
+                    @foreach (TransferResponse operation in _operations.OrderByDescending(x => x.Date))
+                    {
+                        <tr>
+                            <td class="table-brd">@operation.Date.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td class="table-brd">@(string.IsNullOrWhiteSpace(operation.Title) ? "<EMPTY>" : operation.Title)</td>
+                            <td class="table-brd @(_account.IBAN == operation.ReceiverAccountNumber ? "text-green": "text-red")">@($"{(_account.IBAN == operation.SenderAccountNumber ? "- " : string.Empty)}{operation.Amount:F2} PLN")</td>
+                        </tr>
+                    }
+                </table>
+                break;
+        }
+    }
+    else
+    {
+        <p>You do not have permission to view this page</p>
+        <a href="/">Click here to redirect to main page</a>
+    }
+}
+else
+{
+    <p>Waiting for authorization...</p>
+}
+
+
+@code {
+    #region ENUMS
+
+    protected enum DataLoadState
+    {
+        Loading,
+        Loaded,
+        NotLoaded
+    }
+
+    #endregion
+
+
+
+    #region SERVICES
+
+    [Inject]
+    protected IAccountsService _accountsService { get; set; }
+
+    [Inject]
+    protected IBalanceService _balanceService { get; set; }
+
+    [Inject]
+    protected ITransfersService _transfersService { get; set; }
+
+    [Inject]
+    protected NavigationManager _navigationManager { get; set; }
+
+    [Inject]
+    protected TokenAuthenticationStateProvider _authenticationStateProvider { get; set; }
+
+    #endregion
+
+
+
+    #region FIELDS
+
+    protected Claims? _claims;
+
+    protected bool _authLoaded;
+
+    protected DataLoadState _dataLoadedState;
+
+    protected decimal _balance;
+    protected IEnumerable<TransferResponse> _operations;
+    protected AccountResponse _account;
+
+    #endregion
+
+
+
+    #region METHODS
+
+    protected override void OnInitialized()
+    {
+        _claims = null;
+        _authLoaded = false;
+        _dataLoadedState = DataLoadState.Loading;
+        _balance = 0.00M;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            AuthenticationState state = await _authenticationStateProvider.GetAuthenticationStateAsync();
+            if (state.User.Claims.Any())
+            {
+                _claims = new Claims(state.User.Claims);
+            }
+            _authLoaded = true;
+
+            StateHasChanged();
+
+            if (_authLoaded)
+            {
+                APIResponse<decimal> balanceResponse = await _balanceService.GetBalance();
+                if (balanceResponse.Status == ResponseStatus.Ok)
+                {
+                    _balance = balanceResponse.Data;
+                }
+                APIResponse<IEnumerable<TransferResponse>> operationsResponse = await _transfersService.GetTransfers();
+                if (operationsResponse.Status == ResponseStatus.Ok)
+                {
+                    _operations = operationsResponse.Data;
+                }
+                APIResponse<IEnumerable<AccountResponse>> accountResponse = await _accountsService.GetAccounts(id: _claims.AccountId);
+                if (accountResponse.Status == ResponseStatus.Ok && accountResponse.Data.Count() == 1)
+                {
+                    _account = accountResponse.Data.First();
+                }
+
+                _dataLoadedState = balanceResponse.Status == ResponseStatus.Ok && operationsResponse.Status == ResponseStatus.Ok && accountResponse.Status == ResponseStatus.Ok ? DataLoadState.Loaded : DataLoadState.NotLoaded;
+
+                StateHasChanged();
+            }
+        }
+    }
+
+    #endregion
+}

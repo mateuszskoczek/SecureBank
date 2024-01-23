@@ -11,6 +11,7 @@ namespace SecureBank.Website.API
         GET,
         POST,
         PUT,
+        PATCH,
         DELETE
     }
 }

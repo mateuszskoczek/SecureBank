@@ -31,6 +31,37 @@ namespace SecureBank.Database
         public string PhoneNumber { get; set; }
 
         [Required]
+        [MaxLength(500)]
+        public string Address { get; set; }
+
+        [Required]
+        [MaxLength(16)]
+        public byte[] PESEL { get; set; }
+
+        [Required]
+        [MaxLength(16)]
+        public byte[] IdCardNumber { get; set; }
+
+        [Required]
+        [MaxLength(26)]
+        public string IBAN { get; set; }
+
+        [Required]
+        [MaxLength(32)]
+        public byte[] CardNumber { get; set; }
+
+        [Required]
+        [MaxLength(16)]
+        public byte[] CardExpirationDate { get; set; }
+
+        [Required]
+        [MaxLength(16)]
+        public byte[] CardCVV { get; set; }
+
+        [Required]
+        public bool IsAdmin { get; set; } = false;
+
+        [Required]
         public byte LoginFailedCount { get; set; } = 0;
 
         [Required]

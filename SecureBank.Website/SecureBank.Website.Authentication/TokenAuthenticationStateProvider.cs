@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -27,8 +28,8 @@ namespace SecureBank.Website.Authentication
 
         #region CONSTRUCTORS
 
-        public TokenAuthenticationStateProvider(IAccountsService accountsService, AuthenticationHelper authenticationHelper, HttpClient httpClient) 
-        { 
+        public TokenAuthenticationStateProvider(IAccountsService accountsService, AuthenticationHelper authenticationHelper, HttpClient httpClient)
+        {
             _accountsService = accountsService;
             _authenticationHelper = authenticationHelper;
             _httpClient = httpClient;
@@ -56,16 +57,22 @@ namespace SecureBank.Website.Authentication
 
             APIResponse<string> refreshResponse = await _accountsService.AuthenticationRefresh();
 
-            if (!refreshResponse.Success)
+            if (refreshResponse.Status != ResponseStatus.Ok)
             {
+                await _authenticationHelper.RemoveToken();
                 _httpClient.DefaultRequestHeaders.Authorization = null;
                 return state;
             }
 
             token = refreshResponse.Data;
 
+            await _authenticationHelper.SaveToken(token);
+
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            state = new AuthenticationState(new ClaimsPrincipal()); //TODO: Add claims
+
+            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+            JwtSecurityToken tokenParsed = tokenHandler.ReadJwtToken(token);
+            state = new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(tokenParsed.Claims)));
 
             return state;
         }

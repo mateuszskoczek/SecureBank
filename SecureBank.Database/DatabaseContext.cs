@@ -25,6 +25,7 @@ namespace SecureBank.Database
         public virtual DbSet<AccountPassword> AccountPasswords { get; set; }
         public virtual DbSet<AccountPasswordIndex> AccountPasswordIndexes { get; set; }
         public virtual DbSet<AccountLoginRequest> AccountLoginRequests { get; set; }
+        public virtual DbSet<Transfer> Transfers { get; set; }
 
         #endregion
 

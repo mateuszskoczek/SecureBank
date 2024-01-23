@@ -57,3 +57,25 @@ h1:focus {
 .text-red {
     color: red;
 }
+
+.text-green {
+    color: green;
+}
+
+.text-big {
+    font-size: 40px;
+}
+
+.vertical-center {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
+
+.table-brd {
+    border: 1px solid black;
+    border-collapse: collapse;
+    padding: 5px;
+}

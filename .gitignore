@@ -398,4 +398,4 @@ FodyWeavers.xsd
 *.sln.iml
 
 # SQLite database
-*.db
+database.db

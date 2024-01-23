@@ -1,9 +1,7 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER app
 WORKDIR /app
-EXPOSE 443
-EXPOSE 80
-ENV ASPNETCORE_URLS=https://+:443;http://+:80
+EXPOSE 8080
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
@@ -15,9 +13,10 @@ COPY ["SecureBank.API/SecureBank.API.Controllers/SecureBank.API.Controllers.cspr
 COPY ["SecureBank.Common/SecureBank.Common.csproj", "SecureBank.Common/"]
 COPY ["SecureBank.API/SecureBank.API.Services/SecureBank.API.Services.csproj", "SecureBank.API/SecureBank.API.Services/"]
 COPY ["SecureBank.Extensions/SecureBank.Extensions.csproj", "SecureBank.Extensions/"]
+COPY ["SecureBank.Authentication/SecureBank.Authentication.csproj", "SecureBank.Authentication/"]
 COPY ["SecureBank.API/SecureBank.API.Helpers/SecureBank.API.Helpers.csproj", "SecureBank.API/SecureBank.API.Helpers/"]
+COPY ["SecureBank.API/SecureBank.API.Encryption/SecureBank.API.Encryption.csproj", "SecureBank.API/SecureBank.API.Encryption/"]
 COPY ["SecureBank.Website/SecureBank.Website.Authentication/SecureBank.Website.Authentication.csproj", "SecureBank.Website/SecureBank.Website.Authentication/"]
-COPY ["SecureBank.Helpers/SecureBank.Helpers.csproj", "SecureBank.Helpers/"]
 COPY ["SecureBank.Website/SecureBank.Website.Services/SecureBank.Website.Services.csproj", "SecureBank.Website/SecureBank.Website.Services/"]
 COPY ["SecureBank.Website/SecureBank.Website.API/SecureBank.Website.API.csproj", "SecureBank.Website/SecureBank.Website.API/"]
 RUN dotnet restore "./SecureBank/./SecureBank.csproj"
@@ -32,4 +31,6 @@ RUN dotnet publish "./SecureBank.csproj" -c $BUILD_CONFIGURATION -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+COPY database-default.db database.db
+USER root
 ENTRYPOINT ["dotnet", "SecureBank.dll"]

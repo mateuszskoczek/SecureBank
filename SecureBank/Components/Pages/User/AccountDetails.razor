@@ -1,0 +1,196 @@
+﻿@page "/account-details"
+
+<h3>Account details</h3>
+
+@if (_authLoaded)
+{
+    @if (_claims is not null)
+    {
+        @switch (_dataLoadedState)
+        {
+            case DataLoadState.Loading:
+                <p>Waiting for data...</p>
+                break;
+            case DataLoadState.NotLoaded:
+                <p>Data cannot be loaded. Try again later.</p>
+                <a href="/">Click here to redirect to main page</a>
+                break;
+            case DataLoadState.Loaded:
+                <h4>Personal data:</h4>
+                <table>
+                    <tr>
+                        <td><strong>First name:</strong></td>
+                        <td>@_data.FirstName</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Last name:</strong></td>
+                        <td>@_data.LastName</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Email:</strong></td>
+                        <td>@_data.Email</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Phone number:</strong></td>
+                        <td>@_data.PhoneNumber</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Address:</strong></td>
+                        <td>@_data.Address</td>
+                    </tr>
+                    <tr>
+                        <td><strong>IBAN:</strong></td>
+                        <td>@_data.IBAN</td>
+                    </tr>
+                </table>
+                <br />
+                <h4>Id card data:</h4>
+                <table>
+                    <tr>
+                        <td><strong>PESEL:</strong></td>
+                        <td>@(_hideIdCardData ? "***********" : _data.PESEL)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Id card number:</strong></td>
+                        <td>@(_hideIdCardData ? "*********" : _data.IdCardNumber)</td>
+                    </tr>
+                </table>
+                <button class="btn btn-secondary" @onclick="@(() => {_hideIdCardData = !_hideIdCardData; StateHasChanged();})">@(_hideIdCardData ? "Show" : "Hide")</button>
+                <br />
+                <br />
+                <h4>Debit card data:</h4>
+                <table>
+                    <tr>
+                        <td><strong>Card number:</strong></td>
+                        <td>@(_hideDebitCardData ? "****************" : _data.CardNumber)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Expiration date:</strong></td>
+                        <td>@(_hideDebitCardData ? "**/**" : _data.CardExpirationDate)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CVV:</strong></td>
+                        <td>@(_hideDebitCardData ? "***" : _data.CardCVV)</td>
+                    </tr>
+                </table>
+                <button class="btn btn-secondary" @onclick="@(() => {_hideDebitCardData = !_hideDebitCardData; StateHasChanged();})">@(_hideDebitCardData ? "Show" : "Hide")</button>
+                <br/>
+                <br/>
+                <h4>Options:</h4>
+                <button class="btn btn-primary" @onclick="@ChangePassword">Change password</button>
+                break;
+        }
+    }
+    else
+    {
+        <p>You do not have permission to view this page</p>
+        <a href="/">Click here to redirect to main page</a>
+    }
+}
+else
+{
+    <p>Waiting for authorization...</p>
+}
+
+@code 
+{
+    #region ENUMS
+
+    protected enum DataLoadState
+    {
+        Loading,
+        Loaded,
+        NotLoaded
+    }
+
+    #endregion
+
+
+
+    #region SERVICES
+
+    [Inject]
+    protected IAccountsService _accountsService { get; set; }
+
+    [Inject]
+    protected IBalanceService _balanceService { get; set; }
+
+    [Inject]
+    protected ITransfersService _transfersService { get; set; }
+
+    [Inject]
+    protected NavigationManager _navigationManager { get; set; }
+
+    [Inject]
+    protected TokenAuthenticationStateProvider _authenticationStateProvider { get; set; }
+
+    #endregion
+
+
+
+    #region FIELDS
+
+    protected Claims? _claims;
+
+    protected bool _authLoaded;
+
+    protected DataLoadState _dataLoadedState;
+
+    protected AccountResponse _data;
+
+    protected bool _hideIdCardData;
+    protected bool _hideDebitCardData;
+
+    #endregion
+
+
+
+    #region METHODS
+
+    protected override void OnInitialized()
+    {
+        _claims = null;
+        _authLoaded = false;
+        _dataLoadedState = DataLoadState.Loading;
+        _data = null;
+        _hideIdCardData = true;
+        _hideDebitCardData = true;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            AuthenticationState state = await _authenticationStateProvider.GetAuthenticationStateAsync();
+            if (state.User.Claims.Any())
+            {
+                _claims = new Claims(state.User.Claims);
+            }
+            _authLoaded = true;
+
+            StateHasChanged();
+
+            if (_authLoaded)
+            {
+                APIResponse<IEnumerable<AccountResponse>> dataResponse = await _accountsService.GetAccounts(id: _claims.AccountId);
+                if (dataResponse.Status == ResponseStatus.Ok && dataResponse.Data.Count() == 1)
+                {
+                    _data = dataResponse.Data.ElementAt(0);
+                    _dataLoadedState = DataLoadState.Loaded;
+                }
+                else
+                {
+                    _dataLoadedState = DataLoadState.NotLoaded;
+                }
+                StateHasChanged();
+            }
+        }
+    }
+
+    protected void ChangePassword()
+    {
+        _navigationManager.NavigateTo("/account-details/change-password", true);
+    }
+
+    #endregion
+}

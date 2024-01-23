@@ -29,14 +29,24 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SecureBank.API.Authenticati
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SecureBank.Website.Authentication", "SecureBank.Website\SecureBank.Website.Authentication\SecureBank.Website.Authentication.csproj", "{4BC964A3-91C9-47FD-9A78-1E43301E9779}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SecureBank.Helpers", "SecureBank.Helpers\SecureBank.Helpers.csproj", "{F98EC0ED-E78E-4908-A00E-5D9F45D88E33}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6A111947-FD57-4EF7-8B03-C46E73B68DE1}"
 	ProjectSection(SolutionItems) = preProject
 		.dockerignore = .dockerignore
 		database.db = database.db
-		Dockerfile = Dockerfile
+		docker-compose.yml = docker-compose.yml
+		Main.Dockerfile = Main.Dockerfile
+		Nginx.Dockerfile = Nginx.Dockerfile
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nginx", "Nginx", "{E82E5EB5-85CD-4E15-A5F7-AC1D0F99841E}"
+	ProjectSection(SolutionItems) = preProject
+		localhost.conf = localhost.conf
+		Nginx\nginx.conf = Nginx\nginx.conf
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SecureBank.Authentication", "SecureBank.Authentication\SecureBank.Authentication.csproj", "{3A36A494-9B6C-4E18-AE67-064ACD57BAB6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SecureBank.API.Encryption", "SecureBank.API\SecureBank.API.Encryption\SecureBank.API.Encryption.csproj", "{D5988236-1C22-4A5B-B1E0-A4258A9B1A1F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -88,10 +98,14 @@ Global
 		{4BC964A3-91C9-47FD-9A78-1E43301E9779}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4BC964A3-91C9-47FD-9A78-1E43301E9779}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4BC964A3-91C9-47FD-9A78-1E43301E9779}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F98EC0ED-E78E-4908-A00E-5D9F45D88E33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F98EC0ED-E78E-4908-A00E-5D9F45D88E33}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F98EC0ED-E78E-4908-A00E-5D9F45D88E33}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F98EC0ED-E78E-4908-A00E-5D9F45D88E33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A36A494-9B6C-4E18-AE67-064ACD57BAB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A36A494-9B6C-4E18-AE67-064ACD57BAB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A36A494-9B6C-4E18-AE67-064ACD57BAB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A36A494-9B6C-4E18-AE67-064ACD57BAB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5988236-1C22-4A5B-B1E0-A4258A9B1A1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5988236-1C22-4A5B-B1E0-A4258A9B1A1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5988236-1C22-4A5B-B1E0-A4258A9B1A1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5988236-1C22-4A5B-B1E0-A4258A9B1A1F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -104,6 +118,8 @@ Global
 		{41FA4292-92B0-4810-8127-6E70E2073D38} = {E23C57D5-1527-4482-963B-374CF1A098D5}
 		{54220F73-24DE-47BB-A027-5326E90A59B6} = {E23C57D5-1527-4482-963B-374CF1A098D5}
 		{4BC964A3-91C9-47FD-9A78-1E43301E9779} = {EFBD13EE-AF89-4792-A3DE-FF38BDA38DD0}
+		{E82E5EB5-85CD-4E15-A5F7-AC1D0F99841E} = {6A111947-FD57-4EF7-8B03-C46E73B68DE1}
+		{D5988236-1C22-4A5B-B1E0-A4258A9B1A1F} = {E23C57D5-1527-4482-963B-374CF1A098D5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {626ACE64-EFF9-4C9A-84DC-DFF35D76AF59}

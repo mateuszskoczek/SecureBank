@@ -1,0 +1,337 @@
+﻿@page "/admin/create-transfer"
+
+<h3>Create new transfer</h3>
+
+@if (_authLoaded)
+{
+    @if (_claims is not null && _claims.IsAdmin)
+    {
+        @switch (_stage)
+        {
+            case (Stage.Form):
+                <EditForm Model="@_data" OnSubmit="SubmitToValidation">
+                    <br />
+                    <p><strong>Sender data:</strong></p>
+                    <div class="form-group">
+                        <label for="sender-account-number-input">
+                            Sender account number:
+                        </label>
+                        <InputText id="sender-account-number-input" class="form-control" minlength="26" maxlength="26" @bind-Value="@_data.SenderAccountNumber"></InputText>
+                    </div>
+                    <div class="form-group">
+                        <label for="sender-name-input">
+                            Sender name:
+                        </label>
+                        <InputText id="sender-name-input" class="form-control" @bind-Value="@_data.SenderName"></InputText>
+                    </div>
+                    <div class="form-group">
+                        <label for="sender-address-input">
+                            Sender address:
+                        </label>
+                        <InputText id="sender-address-input" class="form-control" @bind-Value="@_data.SenderAddress"></InputText>
+                    </div>
+                    <br />
+                    <br />
+                    <p><strong>Receiver data:</strong></p>
+                    <div class="form-group">
+                        <label for="receiver-account-number-input">
+                            Receiver account number:
+                        </label>
+                        <InputText id="receiver-account-number-input" class="form-control" minlength="26" maxlength="26" @bind-Value="@_data.ReceiverAccountNumber"></InputText>
+                    </div>
+                    <div class="form-group">
+                        <label for="receiver-name-input">
+                            Receiver name:
+                        </label>
+                        <InputText id="receiver-name-input" class="form-control" @bind-Value="@_data.ReceiverName"></InputText>
+                    </div>
+                    <div class="form-group">
+                        <label for="receiver-address-input">
+                            Receiver address:
+                        </label>
+                        <InputText id="receiver-address-input" class="form-control" @bind-Value="@_data.ReceiverAddress"></InputText>
+                    </div>
+                    <br />
+                    <br />
+                    <p><strong>Transfer data:</strong></p>
+                    <div class="form-group">
+                        <label for="title-input">
+                            Title:
+                        </label>
+                        <InputText id="title-input" class="form-control" @bind-Value="@_data.Title"></InputText>
+                    </div>
+                    <div class="form-group">
+                        <label for="amount-input">
+                            Amount (PLN):
+                        </label>
+                        <InputNumber id="amount-input" class="form-control" @bind-Value="@_data.Amount"></InputNumber>
+                    </div>
+                    <br />
+                    <br />
+                    <button type="submit" class="btn btn-primary">Submit to validation</button>
+                </EditForm>
+                break;
+            case (Stage.Validated):
+                <p><strong>Sender data:</strong></p>
+                <table>
+                    <tr>
+                        <td>Account number:</td>
+                        <td>@_data.SenderAccountNumber</td>
+                    </tr>
+                    <tr>
+                        <td>Name:</td>
+                        <td>@(_data.SenderName ?? "<EMPTY>")</td>
+                    </tr>
+                    <tr>
+                        <td>Address:</td>
+                        <td>@(_data.SenderAddress ?? "<EMPTY>")</td>
+                    </tr>
+                    <tr>
+                        <td>Account balance after transfer:</td>
+                        <td>@_senderAmount</td>
+                    </tr>
+                </table>
+                <br />
+                <br />
+                <p><strong>Receiver data:</strong></p>
+                <table>
+                    <tr>
+                        <td>Account number:</td>
+                        <td>@_data.ReceiverAccountNumber</td>
+                    </tr>
+                    <tr>
+                        <td>Name:</td>
+                        <td>@(_data.ReceiverName ?? "<EMPTY>")</td>
+                    </tr>
+                    <tr>
+                        <td>Address:</td>
+                        <td>@(_data.ReceiverAddress ?? "<EMPTY>")</td>
+                    </tr>
+                    <tr>
+                        <td>Account balance after transfer:</td>
+                        <td>@_receiverAmount</td>
+                    </tr>
+                </table>
+                <br />
+                <br />
+                <p><strong>Transfer data:</strong></p>
+                <table>
+                    <tr>
+                        <td>Title:</td>
+                        <td>@(_data.Title ?? "<EMPTY>")</td>
+                    </tr>
+                    <tr>
+                        <td>Amount:</td>
+                        <td>@_data.Amount PLN</td>
+                    </tr>
+                </table>
+
+                <br />
+
+                <button class="btn btn-primary" type="submit" @onclick="@SubmitTransfer">Submit</button>
+                break;
+            case (Stage.Accepted):
+                <p>Transfer for amount @_data.Amount PLN was successfully sent from account with number @_data.SenderAccountNumber to account with number @_data.ReceiverAccountNumber</p>
+                <button class="btn btn-secondary" @onclick="@NavigateToAdminPanel">Go back to admin panel</button>
+                <button class="btn btn-primary" @onclick="@NavigateToNewForm">Create next transfer</button>
+                break;
+        }
+
+        @if (!string.IsNullOrWhiteSpace(_errorMessage))
+        {
+            <p class="text-red">Error: @_errorMessage</p>
+        }
+    }
+    else
+    {
+        <p>You do not have permission to view this page</p>
+        <a href="/">Click here to redirect to main page</a>
+    }
+}
+else
+{
+    <p>Waiting for authorization...</p>
+}
+
+
+@code 
+{
+    #region ENUMS
+
+    protected enum Stage
+    {
+        Form,
+        Validated,
+        Accepted
+    }
+
+    #endregion
+
+
+    #region SERVICES
+
+    [Inject]
+    protected NavigationManager _navigationManager { get; set; }
+
+    [Inject]
+    protected TokenAuthenticationStateProvider _authenticationStateProvider { get; set; }
+
+    [Inject]
+    protected IAccountsService _accountsService { get; set; }
+
+    [Inject]
+    protected IBalanceService _balanceService { get; set; }
+
+    [Inject]
+    protected ITransfersService _transfersService { get; set; }
+
+    #endregion
+
+
+
+    #region FIELDS
+
+    protected Claims? _claims;
+
+    protected bool _authLoaded;
+
+    protected Stage _stage;
+
+    protected string? _errorMessage;
+
+    protected CreateAdminTransferRequest _data;
+
+    protected string _senderAmount;
+    protected string _receiverAmount;
+
+    #endregion
+
+
+
+    #region METHODS
+
+    protected override void OnInitialized()
+    {
+        _claims = null;
+        _authLoaded = false;
+        _stage = Stage.Form;
+        _errorMessage = null;
+        _data = new CreateAdminTransferRequest();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            AuthenticationState state = await _authenticationStateProvider.GetAuthenticationStateAsync();
+            if (state.User.Claims.Any())
+            {
+                _claims = new Claims(state.User.Claims);
+            }
+            _authLoaded = true;
+            StateHasChanged();
+        }
+    }
+
+    protected async void SubmitToValidation()
+    {
+        if (_data.SenderAccountNumber is null)
+        {
+            _errorMessage = "Sender account number cannot be empty";
+            return;
+        }
+
+        if (!_data.SenderAccountNumber.All(x => char.IsDigit(x)))
+        {
+            _errorMessage = "Wrong sender account number format. Account number consists only of digits";
+            return;
+        }
+
+        if (_data.SenderAccountNumber.Length != 26)
+        {
+            _errorMessage = "Wrong sender account number format. Account number must have length of 26 digits";
+            return;
+        }
+
+        if (_data.ReceiverAccountNumber is null)
+        {
+            _errorMessage = "Receiver account number cannot be empty";
+            return;
+        }
+
+        if (!_data.ReceiverAccountNumber.All(x => char.IsDigit(x)))
+        {
+            _errorMessage = "Wrong receiver account number format. Account number consists only of digits";
+            return;
+        }
+
+        if (_data.ReceiverAccountNumber.Length != 26)
+        {
+            _errorMessage = "Wrong receiver account number format. Account number must have length of 26 digits";
+            return;
+        }
+
+        if (_data.Amount <= 0)
+        {
+            _errorMessage = "Transfer amount has to be greater than 0 PLN";
+            return;
+        }
+
+        _data.Amount = Math.Round(_data.Amount, 2, MidpointRounding.ToEven);
+
+        _senderAmount = await GetBalance(_data.SenderAccountNumber, -_data.Amount);
+        _receiverAmount = await GetBalance(_data.ReceiverAccountNumber, _data.Amount);
+
+        _stage = Stage.Validated;
+        _errorMessage = null;
+        StateHasChanged();
+    }
+
+    protected async Task<string> GetBalance(string accountNumber, decimal amount)
+    {
+        APIResponse<IEnumerable<AccountResponse>> senderAccountResponse = await _accountsService.GetAccounts(iban: accountNumber);
+        if (senderAccountResponse.Status == ResponseStatus.Ok && senderAccountResponse.Data.Count() == 1)
+        {
+            APIResponse<decimal> senderAmountResponse = await _balanceService.GetAccountBalance(senderAccountResponse.Data.ElementAt(0).Id);
+            if (senderAmountResponse.Status == ResponseStatus.Ok)
+            {
+                return $"{(senderAmountResponse.Data + amount):F2} PLN";
+            }
+            else
+            {
+                return "<ERROR: Cannot get sender account balance>";
+            }
+        }
+        else
+        {
+            return "<NON SECUREBANK ACCOUNT>";
+        }
+    }
+
+    protected async Task SubmitTransfer()
+    {
+        APIResponse response = await _transfersService.CreateAdminTransfer(_data);
+        if (response.Status == ResponseStatus.Ok)
+        {
+            _errorMessage = null;
+            _stage = Stage.Accepted;
+            StateHasChanged();
+        }
+        else
+        {
+            _errorMessage = response.Message;
+        }
+    }
+
+    protected void NavigateToAdminPanel()
+    {
+        _navigationManager.NavigateTo("/admin", true);
+    }
+
+    protected void NavigateToNewForm()
+    {
+        _navigationManager.Refresh(true);
+    }
+
+    #endregion
+}

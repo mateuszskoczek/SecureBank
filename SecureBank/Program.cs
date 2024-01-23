@@ -1,10 +1,12 @@
 using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SecureBank.API.Authentication;
+using SecureBank.API.Encryption;
 using SecureBank.Components;
 using SecureBank.Database;
 using SecureBank.Website.API;
@@ -54,8 +56,10 @@ public class Program
         if (!app.Environment.IsDevelopment())
         {
             app.UseExceptionHandler("/Error");
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-            app.UseHsts();
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
         }
         else
         {
@@ -68,12 +72,13 @@ public class Program
                 x.SwaggerEndpoint("/api/swagger/v1/swagger.json", "SecureBank API");
                 x.RoutePrefix = "api/swagger";
             });
+            app.UseHttpsRedirection();
         }
-
-        app.UseHttpsRedirection();
 
         app.UseStaticFiles();
         app.UseAntiforgery();
+
+        JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
         app.UseAuthentication();
         app.UseAuthorization();
@@ -82,6 +87,17 @@ public class Program
 
         app.MapRazorComponents<App>()
             .AddInteractiveServerRenderMode();
+
+        using (var scope = app.Services.CreateScope())
+        {
+            var services = scope.ServiceProvider;
+
+            var context = services.GetRequiredService<DatabaseContext>();
+            if (context.Database.GetPendingMigrations().Any())
+            {
+                context.Database.Migrate();
+            }
+        }
 
         app.Run();
     }
@@ -136,12 +152,16 @@ public class Program
 
         // Configurations
         _builder.Services.AddSingleton<AuthenticationConfiguration>();
+        _builder.Services.AddSingleton<EncryptionConfiguration>();
 
         // Helpers
         _builder.Services.AddSingleton<API.Authentication.AuthenticationHelper>();
+        _builder.Services.AddSingleton<API.Encryption.EncryptionHelper>();
 
         // Services
         _builder.Services.AddSingleton<API.Services.IAccountsService, API.Services.AccountsService>();
+        _builder.Services.AddSingleton<API.Services.IBalanceService, API.Services.BalanceService>();
+        _builder.Services.AddSingleton<API.Services.ITransfersService, API.Services.TransfersService>();
     }
 
     protected static void BuildWebsite()
@@ -166,6 +186,8 @@ public class Program
 
         // Services
         _builder.Services.AddSingleton<Website.Services.IAccountsService, Website.Services.AccountsService>();
+        _builder.Services.AddSingleton<Website.Services.IBalanceService, Website.Services.BalanceService>();
+        _builder.Services.AddSingleton<Website.Services.ITransfersService, Website.Services.TransfersService>();
     }
 
     #endregion

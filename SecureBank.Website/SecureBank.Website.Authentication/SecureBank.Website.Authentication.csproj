@@ -9,10 +9,10 @@
   <ItemGroup>
     <PackageReference Include="Blazored.SessionStorage" Version="2.4.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="8.0.1" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.2.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\SecureBank.Helpers\SecureBank.Helpers.csproj" />
     <ProjectReference Include="..\SecureBank.Website.Services\SecureBank.Website.Services.csproj" />
   </ItemGroup>
 

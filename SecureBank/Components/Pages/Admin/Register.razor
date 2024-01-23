@@ -2,75 +2,121 @@
 
 <h3>Create new client account</h3>
 
-@if (_id is null)
+@if (_authLoaded || true)
 {
-    <EditForm Model="@_data" OnSubmit="Submit">
-        <div class="form-group">
-            <label for="first-name-input">
-                First name:
-            </label>
-            <InputText id="first-name-input" class="form-control" @bind-Value="@_data.FirstName"></InputText>
-        </div>
-        <div class="form-group">
-            <label for="last-name-input">
-                Last name:
-            </label>
-            <InputText id="last-name-input" class="form-control" @bind-Value="@_data.LastName"></InputText>
-        </div>
-        <div class="form-group">
-            <label for="email-input">
-                Email address:
-            </label>
-            <InputText id="email-input" class="form-control" @bind-Value="@_data.Email"></InputText>
-        </div>
-        <div class="form-group">
-            <label for="phone-number-input">
-                Phone number:
-            </label>
-            <InputText id="phone-number-input" class="form-control" @bind-Value="@_data.PhoneNumber"></InputText>
-        </div>
-        <br />
-        <button class="btn btn-primary" type="submit">Submit</button>
-        @if (!string.IsNullOrWhiteSpace(_message))
+    @if (true || (_claims is not null && _claims.IsAdmin))
+    {
+        @if (_id is null)
         {
-            <p class="text-red">Error: @_message</p>
+            <EditForm Model="@_data" OnSubmit="Submit">
+                <div class="form-group">
+                    <label for="first-name-input">
+                        First name:
+                    </label>
+                    <InputText id="first-name-input" class="form-control" @bind-Value="@_data.FirstName"></InputText>
+                </div>
+                <div class="form-group">
+                    <label for="last-name-input">
+                        Last name:
+                    </label>
+                    <InputText id="last-name-input" class="form-control" @bind-Value="@_data.LastName"></InputText>
+                </div>
+                <div class="form-group">
+                    <label for="email-input">
+                        Email address:
+                    </label>
+                    <InputText id="email-input" class="form-control" @bind-Value="@_data.Email"></InputText>
+                </div>
+                <div class="form-group">
+                    <label for="phone-number-input">
+                        Phone number:
+                    </label>
+                    <InputText id="phone-number-input" class="form-control" @bind-Value="@_data.PhoneNumber"></InputText>
+                </div>
+                <div class="form-group">
+                    <label for="address-input">
+                        Address:
+                    </label>
+                    <InputText id="address-input" class="form-control" @bind-Value="@_data.Address"></InputText>
+                </div>
+                <div class="form-group">
+                    <label for="pesel-input">
+                        PESEL:
+                    </label>
+                    <InputText id="pesel-input" maxlength="11" minlength="11" class="form-control" @bind-Value="@_data.PESEL"></InputText>
+                </div>
+                <div class="form-group">
+                    <label for="id-card-number-input">
+                        Id card number:
+                    </label>
+                    <InputText id="id-card-number-input" class="form-control" maxlength="9" minlength="9" @bind-Value="@_data.IdCardNumber"></InputText>
+                </div>
+                <br />
+                <button class="btn btn-primary" type="submit">Submit</button>
+                @if (!string.IsNullOrWhiteSpace(_message))
+                {
+                    <p class="text-red">Error: @_message</p>
+                }
+            </EditForm>
         }
-    </EditForm>
+        else
+        {
+            <p><strong>New client account was created</strong></p>
+            <table>
+                <tr>
+                    <td><strong>Client code:</strong></td>
+                    <td>@($"{_id:00000000}")</td>
+                </tr>
+                <tr>
+                    <td><strong>First name:</strong></td>
+                    <td>@_data.FirstName</td>
+                </tr>
+                <tr>
+                    <td><strong>Last name:</strong></td>
+                    <td>@_data.LastName</td>
+                </tr>
+                <tr>
+                    <td><strong>Email:</strong></td>
+                    <td>@_data.Email</td>
+                </tr>
+                <tr>
+                    <td><strong>Phone number:</strong></td>
+                    <td>@_data.PhoneNumber</td>
+                </tr>
+                <tr>
+                    <td><strong>Address:</strong></td>
+                    <td>@_data.Address</td>
+                </tr>
+                <tr>
+                    <td><strong>PESEL:</strong></td>
+                    <td>@_data.PESEL</td>
+                </tr>
+                <tr>
+                    <td><strong>Id card number:</strong></td>
+                    <td>@_data.IdCardNumber</td>
+                </tr>
+                <tr>
+                    <td><strong>Password:</strong></td>
+                    <td>******** (Information passed on to the client - LOG)</td>
+                </tr>
+            </table>
+            <br />
+            <button class="btn btn-secondary" @onclick="NavigateToAdminPanel">Go back to admin panel</button>
+            <button class="btn btn-primary" @onclick="NavigateToNewForm">Create next account</button>
+
+        }
+    }
+    else
+    {
+        <p>You do not have permission to view this page</p>
+        <a href="/">Click here to redirect to main page</a>
+    }
 }
 else
 {
-    <p><strong>New client account was created</strong></p>
-    <table>
-        <tr>
-            <td><strong>Client code:</strong></td>
-            <td>@($"{_id:00000000}")</td>
-        </tr>
-        <tr>
-            <td><strong>First name:</strong></td>
-            <td>@_data.FirstName</td>
-        </tr>
-        <tr>
-            <td><strong>Last name:</strong></td>
-            <td>@_data.LastName</td>
-        </tr>
-        <tr>
-            <td><strong>Email:</strong></td>
-            <td>@_data.Email</td>
-        </tr>
-        <tr>
-            <td><strong>Phone number:</strong></td>
-            <td>@_data.PhoneNumber</td>
-        </tr>
-        <tr>
-            <td><strong>Password:</strong></td>
-            <td>******** (Information passed on to the client - LOG)</td>
-        </tr>
-    </table>
-    <br/>
-    <button class="btn btn-secondary" @onclick="NavigateToAdminPanel">Go back to admin panel</button>
-    <button class="btn btn-primary" @onclick="NavigateToNewForm">Create next account</button>
-
+    <p>Waiting for authorization...</p>
 }
+
 
 @code {
     #region SERVICES
@@ -80,6 +126,9 @@ else
 
     [Inject]
     protected NavigationManager _navigationManager { get; set; }
+
+    [Inject]
+    protected TokenAuthenticationStateProvider _authenticationStateProvider { get; set; }
 
     #endregion
 
@@ -93,6 +142,10 @@ else
 
     protected string? _message;
 
+    protected Claims? _claims;
+
+    protected bool _authLoaded;
+
     #endregion
 
 
@@ -104,12 +157,28 @@ else
         _data = new CreateAccountRequest();
         _id = null;
         _message = null;
+        _claims = null;
+        _authLoaded = false;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            AuthenticationState state = await _authenticationStateProvider.GetAuthenticationStateAsync();
+            if (state.User.Claims.Any())
+            {
+                _claims = new Claims(state.User.Claims);
+            }
+            _authLoaded = true;
+            StateHasChanged();
+        }
     }
 
     protected async Task Submit()
     {
         APIResponse<int> response = await _accountsService.CreateAccount(_data);
-        if (response.Success)
+        if (response.Status == ResponseStatus.Ok)
         {
             _id = response.Data;
         }
@@ -121,12 +190,12 @@ else
 
     protected void NavigateToNewForm()
     {
-        OnInitialized();
+        _navigationManager.Refresh(true);
     }
 
     protected void NavigateToAdminPanel()
     {
-        _navigationManager.NavigateTo("/"); //TODO: Zmienić na /admin
+        _navigationManager.NavigateTo("/admin", true);
     }
 
     #endregion

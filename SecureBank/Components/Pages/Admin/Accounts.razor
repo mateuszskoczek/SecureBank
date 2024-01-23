@@ -1,0 +1,185 @@
+﻿@page "/admin/accounts-management"
+
+<h3>Accounts</h3>
+
+@if (_authLoaded)
+{
+    @if (_claims is not null && _claims.IsAdmin)
+    {
+        @switch (_dataLoadedState)
+        {
+            case DataLoadState.Loading:
+                <p>Waiting for data...</p>
+                break;
+            case DataLoadState.NotLoaded:
+                <p>Data cannot be loaded. Try again later.</p>
+                <a href="/">Click here to redirect to main page</a>
+                break;
+            case DataLoadState.Loaded:
+                @if (_errorMessage is not null)
+                {
+                    <p>@_errorMessage</p>
+                }
+                <table>
+                    <tr>
+                        <th class="table-brd">Id</th>
+                        <th class="table-brd">Name</th>
+                        <th class="table-brd">Email</th>
+                        <th class="table-brd">Phone number</th>
+                        <th class="table-brd">IBAN</th>
+                        <th class="table-brd">Is password temporary</th>
+                        <th class="table-brd">Is locked</th>
+                        <th class="table-brd">Operations</th>
+                    </tr>
+                    @foreach (var account in _accounts)
+                    {
+                        <tr>
+                            <td class="table-brd">@account.Id</td>
+                            <td class="table-brd">@account.FirstName @account.LastName</td>
+                            <td class="table-brd">@account.Email</td>
+                            <td class="table-brd">@account.PhoneNumber</td>
+                            <td class="table-brd">@account.IBAN</td>
+                            <td class="table-brd">@(account.TemporaryPassword ? "YES" : "NO")</td>
+                            <td class="table-brd">@(account.LockReason is not null || account.LoginFailedCount >= 3 ? "YES" : "NO")</td>
+                            <td class="table-brd">
+                                <button class="btn btn-secondary" @onclick="@(async () => await ResetPassword(account.Id))">Reset password</button>
+                                <button class="btn btn-secondary" @onclick="@(async () => await Unlock(account.Id))" disabled="@(account.LockReason is null && account.LoginFailedCount < 3)">Unlock</button>
+                            </td>
+                        </tr>
+                    }
+                </table>
+                break;
+        }
+    }
+    else
+    {
+        <p>You do not have permission to view this page</p>
+        <a href="/">Click here to redirect to main page</a>
+    }
+}
+else
+{
+    <p>Waiting for authorization...</p>
+}
+
+@code {
+    #region ENUMS
+
+    protected enum DataLoadState
+    {
+        Loading,
+        Loaded,
+        NotLoaded
+    }
+
+    #endregion
+
+
+
+    #region SERVICES
+
+    [Inject]
+    protected IAccountsService _accountsService { get; set; }
+
+    [Inject]
+    protected IBalanceService _balanceService { get; set; }
+
+    [Inject]
+    protected ITransfersService _transfersService { get; set; }
+
+    [Inject]
+    protected NavigationManager _navigationManager { get; set; }
+
+    [Inject]
+    protected TokenAuthenticationStateProvider _authenticationStateProvider { get; set; }
+
+    #endregion
+
+
+
+    #region FIELDS
+
+    protected Claims? _claims;
+
+    protected bool _authLoaded;
+
+    protected DataLoadState _dataLoadedState;
+
+    protected IEnumerable<AccountResponse> _accounts;
+
+    protected string? _errorMessage;
+
+    #endregion
+
+
+
+    #region METHODS
+
+    protected override void OnInitialized()
+    {
+        _claims = null;
+        _authLoaded = false;
+        _dataLoadedState = DataLoadState.Loading;
+        _errorMessage = null;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            AuthenticationState state = await _authenticationStateProvider.GetAuthenticationStateAsync();
+            if (state.User.Claims.Any())
+            {
+                _claims = new Claims(state.User.Claims);
+            }
+            _authLoaded = true;
+
+            StateHasChanged();
+
+            if (_authLoaded)
+            {
+                APIResponse<IEnumerable<AccountResponse>> accountResponse = await _accountsService.GetAccounts();
+                if (accountResponse.Status == ResponseStatus.Ok)
+                {
+                    _accounts = accountResponse.Data;
+                }
+                else if (accountResponse.Status == ResponseStatus.Unauthorized)
+                {
+                    _claims = null;
+                }
+
+                _dataLoadedState = accountResponse.Status == ResponseStatus.Ok ? DataLoadState.Loaded : DataLoadState.NotLoaded;
+
+                StateHasChanged();
+            }
+        }
+    }
+
+    protected async Task ResetPassword(int id)
+    {
+        APIResponse response = await _accountsService.ResetPassword(id);
+        if (response.Status == ResponseStatus.Ok)
+        {
+            _navigationManager.Refresh(true);
+        }
+        else
+        {
+            _errorMessage = $"An error occured while reseting password for account with id {id}. {response.Message}";
+        }
+    }
+
+    protected async Task Unlock(int id)
+    {
+        APIResponse response = await _accountsService.UnlockAccount(id);
+        if (response.Status == ResponseStatus.Ok)
+        {
+            _navigationManager.Refresh(true);
+        }
+        else
+        {
+            _errorMessage = $"An error occured while unlocking account with id {id}. {response.Message}";
+        }
+    }
+
+    #endregion
+}

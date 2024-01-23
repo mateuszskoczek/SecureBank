@@ -12,7 +12,34 @@
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
                 <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
             </NavLink>
+            @if (Claims is not null)
+            {
+                <NavLink class="nav-link" href="/dashboard" Match="NavLinkMatch.All">
+                    <span class="bi bi-dashboard-nav-menu" aria-hidden="true"></span> Dashboard
+                </NavLink>
+                <NavLink class="nav-link" href="/create-transfer" Match="NavLinkMatch.All">
+                    <span class="bi bi-transfer-nav-menu" aria-hidden="true"></span> Create transfer
+                </NavLink>
+                <NavLink class="nav-link" href="/account-details" Match="NavLinkMatch.All">
+                    <span class="bi bi-account-details-nav-menu" aria-hidden="true"></span> Account details
+                </NavLink>
+                @if (Claims.IsAdmin)
+                {
+                    <NavLink class="nav-link" href="/admin" Match="NavLinkMatch.All">
+                        <span class="bi bi-admin-nav-menu" aria-hidden="true"></span> Admin panel
+                    </NavLink>
+                }
+            }
         </div>
     </nav>
 </div>
 
+@code
+{
+    #region PARAMETERS
+
+    [Parameter]
+    public Claims? Claims { get; set; }
+
+    #endregion
+}

@@ -2,12 +2,20 @@
 
 <div class="page">
     <div class="sidebar">
-        <NavMenu />
+        <NavMenu Claims="@_claims"/>
     </div>
 
     <main>
         <div class="top-row px-4">
-            <a href="/auth">Login</a>
+            @if (_claims is null)
+            {
+                <button class="btn btn-primary" @onclick="@Login">Login</button>
+            }
+            else
+            {
+                <p class="vertical-center" style="margin: 0px 80px 0px 0px;">Logged as: @($"{_claims.FirstName} {_claims.LastName} ({_claims.AccountId:00000000})")</p>
+                <button class="btn btn-primary" @onclick="@Logout">Logout</button>
+            }
         </div>
 
         <article class="content px-4">
@@ -21,3 +29,58 @@
     <a href="" class="reload">Reload</a>
     <a class="dismiss">🗙</a>
 </div>
+
+@code
+{
+    #region SERVICES
+
+    [Inject]
+    protected TokenAuthenticationStateProvider _authenticationStateProvider { get; set; }
+
+    [Inject]
+    protected AuthenticationHelper _authenticationHelper { get; set; }
+
+    [Inject]
+    protected NavigationManager _navigationManager { get; set; }
+
+    #endregion
+
+
+
+    #region FIELDS
+
+    protected Claims? _claims;
+
+    #endregion
+
+
+
+    #region METHODS
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            AuthenticationState authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+            _claims = null;
+            if (authState.User.Claims.Any())
+            {
+                _claims = new Claims(authState.User.Claims);
+            }
+            StateHasChanged();
+        }
+    }
+
+    protected void Login()
+    {
+        _navigationManager.NavigateTo("/auth");  
+    }
+
+    protected async Task Logout()
+    {
+        await _authenticationHelper.RemoveToken();
+        _navigationManager.NavigateTo("/", true);
+    }
+
+    #endregion
+}

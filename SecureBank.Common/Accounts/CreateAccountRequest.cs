@@ -25,5 +25,17 @@ namespace SecureBank.Common.Accounts
         [JsonProperty("phone_number")]
         [JsonPropertyName("phone_number")]
         public string PhoneNumber { get; set; }
+
+        [JsonProperty("address")]
+        [JsonPropertyName("address")]
+        public string Address { get; set; }
+
+        [JsonProperty("pesel")]
+        [JsonPropertyName("pesel")]
+        public string PESEL { get; set; }
+
+        [JsonProperty("id_card_number")]
+        [JsonPropertyName("id_card_number")]
+        public string IdCardNumber { get; set; }
     }
 }

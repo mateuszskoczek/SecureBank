@@ -15,6 +15,10 @@ namespace SecureBank.Website.Services
         Task<APIResponse<GetPasswordVariantResponse>> GetPasswordVariant(int accountId);
         Task<APIResponse<string>> Authentication(int accountId, AuthenticationRequest data);
         Task<APIResponse<string>> AuthenticationRefresh();
+        Task<APIResponse> ChangePassword(ChangePasswordRequest data);
+        Task<APIResponse<IEnumerable<AccountResponse>>> GetAccounts(int? id = null, string? iban = null);
+        Task<APIResponse> ResetPassword(int accountId);
+        Task<APIResponse> UnlockAccount(int accountId);
     }
 
 
@@ -57,13 +61,43 @@ namespace SecureBank.Website.Services
 
         public async Task<APIResponse<string>> Authentication(int accountId, AuthenticationRequest data)
         {
-            string url = string.Format(_configuration.AccountsAuthentication, accountId);
-            return await _apiClient.SendAsync<string, AuthenticationRequest>(APIMethodType.POST, url, data);
+            return await _apiClient.SendAsync<string, AuthenticationRequest>(APIMethodType.POST, _configuration.AccountsAuthentication, data);
         }
 
         public async Task<APIResponse<string>> AuthenticationRefresh()
         {
             return await _apiClient.SendAsync<string>(APIMethodType.POST, _configuration.AccountsAuthenticationRefresh);
+        }
+
+        public async Task<APIResponse> ChangePassword(ChangePasswordRequest data)
+        {
+            return await _apiClient.SendAsync(APIMethodType.PATCH, _configuration.AccountsChangePassword, data);
+        }
+
+        public async Task<APIResponse<IEnumerable<AccountResponse>>> GetAccounts(int? id = null, string? iban = null)
+        {
+            Dictionary<string, string> query = new Dictionary<string, string>();
+            if (id.HasValue)
+            {
+                query.Add("id", id.Value.ToString());
+            }
+            if (iban is not null)
+            {
+                query.Add("iban", iban);
+            }
+            return await _apiClient.SendAsync<IEnumerable<AccountResponse>>(APIMethodType.GET, _configuration.AccountsGetAccounts, query);
+        }
+
+        public async Task<APIResponse> ResetPassword(int accountId)
+        {
+            string url = string.Format(_configuration.AccountsResetPassword, accountId);
+            return await _apiClient.SendAsync(APIMethodType.PATCH, url);
+        }
+
+        public async Task<APIResponse> UnlockAccount(int accountId)
+        {
+            string url = string.Format(_configuration.AccountsUnlockAccount, accountId);
+            return await _apiClient.SendAsync(APIMethodType.PATCH, url);
         }
 
         #endregion

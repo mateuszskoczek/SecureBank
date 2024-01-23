@@ -1,12 +1,18 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Identity.Client;
+using SecureBank.API.Authentication;
 using SecureBank.API.Services;
+using SecureBank.Authentication;
 using SecureBank.Common;
 using SecureBank.Common.Accounts;
+using SecureBank.Helpers.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -40,18 +46,17 @@ namespace SecureBank.API.Controllers
 
         [HttpPost]
         [Route("create-account")]
-        [AllowAnonymous]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [RequiresClaim("admin", "True")]
         public async Task<ActionResult<APIResponse<int>>> CreateAccount([FromBody] CreateAccountRequest data)
         {
             APIResponse<int> response = await _accountsService.CreateAccount(data);
-            if (response.Success)
+            return response.Status switch
             {
-                return Ok(response);
-            }
-            else
-            {
-                return BadRequest(response);
-            }
+                ResponseStatus.Ok => Ok(response),
+                ResponseStatus.BadRequest => BadRequest(response),
+                ResponseStatus.Unauthorized => Unauthorized(response),
+            };
         }
 
         [HttpGet]
@@ -60,35 +65,102 @@ namespace SecureBank.API.Controllers
         public async Task<ActionResult<APIResponse<GetPasswordVariantResponse>>> GetPasswordVariant([FromRoute(Name = "account_id")] int accountId)
         {
             APIResponse<GetPasswordVariantResponse> response = await _accountsService.GetPasswordVariant(accountId);
-            if (response.Success)
+            return response.Status switch
             {
-                return Ok(response);
-            }
-            else
-            {
-                return BadRequest(response);
-            }
+                ResponseStatus.Ok => Ok(response),
+                ResponseStatus.BadRequest => BadRequest(response),
+                ResponseStatus.Unauthorized => Unauthorized(response),
+            };
         }
 
         [HttpPost]
-        [Route("{account_id}/authentication")]
+        [Route("authentication")]
         [AllowAnonymous]
         /*
          * Action codes:
          * 1 - Go back to client code input
-         * 2 - Failed login count increment
+         * 2 - Change password required
          */
-        public async Task<ActionResult<APIResponse<string>>> Authentication([FromRoute(Name = "account_id")] int accountId, [FromBody] AuthenticationRequest data)
+        public async Task<ActionResult<APIResponse<string>>> Authentication([FromBody] AuthenticationRequest data)
         {
-            APIResponse<string> response = await _accountsService.Authentication(accountId, data);
-            if (response.Success)
+            APIResponse<string> response = await _accountsService.Authentication(data);
+            return response.Status switch
             {
-                return Ok(response);
-            }
-            else
+                ResponseStatus.Ok => Ok(response),
+                ResponseStatus.BadRequest => BadRequest(response),
+                ResponseStatus.Unauthorized => Unauthorized(response),
+            };
+        }
+
+        [HttpPost]
+        [Route("authentication-refresh")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<APIResponse<string>>> AuthenticationRefresh()
+        {
+            APIResponse<string> response = await _accountsService.AuthenticationRefresh(new Claims(User.Claims));
+            return response.Status switch
             {
-                return BadRequest(response);
-            }
+                ResponseStatus.Ok => Ok(response),
+                ResponseStatus.BadRequest => BadRequest(response),
+                ResponseStatus.Unauthorized => Unauthorized(response),
+            };
+        }
+
+        [HttpPatch]
+        [Route("change-password")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<APIResponse>> ChangePassword([FromBody] ChangePasswordRequest data)
+        {
+            APIResponse response = await _accountsService.ChangePassword(new Claims(User.Claims), data);
+            return response.Status switch
+            {
+                ResponseStatus.Ok => Ok(response),
+                ResponseStatus.BadRequest => BadRequest(response),
+                ResponseStatus.Unauthorized => Unauthorized(response),
+            };
+        }
+
+        [HttpGet]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<APIResponse<IEnumerable<AccountResponse>>>> GetAccounts([FromQuery]int? id, [FromQuery] string? iban)
+        {
+            APIResponse<IEnumerable<AccountResponse>> response = await _accountsService.GetAccounts(iban, id, new Claims(User.Claims));
+            return response.Status switch
+            {
+                ResponseStatus.Ok => Ok(response),
+                ResponseStatus.BadRequest => BadRequest(response),
+                ResponseStatus.Unauthorized => Unauthorized(response),
+            };
+        }
+
+        [HttpPatch]
+        [Route("{account_id}/reset-password")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [RequiresClaim("admin", "True")]
+        public async Task<ActionResult<APIResponse>> ResetPassword([FromRoute(Name = "account_id")] int accountId)
+        {
+            APIResponse response = await _accountsService.ResetPassword(accountId);
+            return response.Status switch
+            {
+                ResponseStatus.Ok => Ok(response),
+                ResponseStatus.BadRequest => BadRequest(response),
+                ResponseStatus.Unauthorized => Unauthorized(response),
+            };
+        }
+
+        [HttpPatch]
+        [Route("{account_id}/unlock")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [RequiresClaim("admin", "True")]
+        public async Task<ActionResult<APIResponse>> UnlockAccount([FromRoute(Name = "account_id")] int accountId)
+        {
+            APIResponse response = await _accountsService.UnlockAccount(accountId);
+            return response.Status switch
+            {
+                ResponseStatus.Ok => Ok(response),
+                ResponseStatus.BadRequest => BadRequest(response),
+                ResponseStatus.Unauthorized => Unauthorized(response),
+            };
         }
 
         #endregion

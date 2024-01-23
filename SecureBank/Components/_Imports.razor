@@ -1,13 +1,18 @@
 ﻿@using System.Net.Http
 @using System.Net.Http.Json
+@using System.Net.Http.Headers;
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Authorization
 @using static Microsoft.AspNetCore.Components.Web.RenderMode
 @using Microsoft.AspNetCore.Components.Web.Virtualization
 @using Microsoft.JSInterop
 @using SecureBank
+@using SecureBank.Authentication
 @using SecureBank.Components
-@using SecureBank.Website.Services;
-@using SecureBank.Common;
-@using SecureBank.Common.Accounts;
+@using SecureBank.Website.Authentication
+@using SecureBank.Website.Services
+@using SecureBank.Common
+@using SecureBank.Common.Accounts
+@using SecureBank.Common.Transfers

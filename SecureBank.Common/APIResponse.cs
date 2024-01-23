@@ -12,21 +12,21 @@ namespace SecureBank.Common
     {
         [JsonProperty("message")]
         [JsonPropertyName("message")]
-        public string Message { get; set; }
+        public string? Message { get; set; }
 
-        [JsonProperty("success")]
-        [JsonPropertyName("success")]
-        public bool Success { get; set; }
+        [JsonProperty("status")]
+        [JsonPropertyName("status")]
+        public ResponseStatus Status { get; set; } = ResponseStatus.Ok;
 
         [JsonProperty("action_code")]
         [JsonPropertyName("action_code")]
-        public int ActionCode { get; set; }
+        public int? ActionCode { get; set; }
     }
 
     public class APIResponse<T> : APIResponse
     {
         [JsonProperty("data")]
         [JsonPropertyName("data")]
-        public T Data { get; set; }
+        public T? Data { get; set; }
     }
 }
