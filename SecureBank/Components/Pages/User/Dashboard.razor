@@ -123,7 +123,7 @@ else
 
             StateHasChanged();
 
-            if (_authLoaded)
+            if (_authLoaded && _claims is not null)
             {
                 APIResponse<decimal> balanceResponse = await _balanceService.GetBalance();
                 if (balanceResponse.Status == ResponseStatus.Ok)

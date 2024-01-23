@@ -31,12 +31,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SecureBank.API.Encryption\SecureBank.API.Encryption.csproj" />
     <ProjectReference Include="..\SecureBank.API\SecureBank.API.Authentication\SecureBank.API.Authentication.csproj" />
     <ProjectReference Include="..\SecureBank.API\SecureBank.API.Controllers\SecureBank.API.Controllers.csproj" />
     <ProjectReference Include="..\SecureBank.API\SecureBank.API.Encryption\SecureBank.API.Encryption.csproj" />
     <ProjectReference Include="..\SecureBank.API\SecureBank.API.Services\SecureBank.API.Services.csproj" />
-    <ProjectReference Include="..\SecureBank.API\SecureBank.API.Token\SecureBank.API.Authentication.csproj" />
     <ProjectReference Include="..\SecureBank.Authentication\SecureBank.Authentication.csproj" />
     <ProjectReference Include="..\SecureBank.Common\SecureBank.Common.csproj" />
     <ProjectReference Include="..\SecureBank.Database\SecureBank.Database.csproj" />

@@ -170,7 +170,7 @@ else
 
             StateHasChanged();
 
-            if (_authLoaded)
+            if (_authLoaded && _claims is not null)
             {
                 APIResponse<IEnumerable<AccountResponse>> dataResponse = await _accountsService.GetAccounts(id: _claims.AccountId);
                 if (dataResponse.Status == ResponseStatus.Ok && dataResponse.Data.Count() == 1)
