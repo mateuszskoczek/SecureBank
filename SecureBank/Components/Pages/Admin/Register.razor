@@ -2,9 +2,9 @@
 
 <h3>Create new client account</h3>
 
-@if (_authLoaded || true)
+@if (_authLoaded)
 {
-    @if (true || (_claims is not null && _claims.IsAdmin))
+    @if (_claims is not null && _claims.IsAdmin)
     {
         @if (_id is null)
         {
