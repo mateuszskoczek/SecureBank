@@ -9,13 +9,12 @@ services:
       - "80:80"
       - "443:443"
     restart: always
-
   securebank-website:
     container_name: securebank-website
     depends_on:
       - securebank-proxy
     build:
       dockerfile: Main.Dockerfile
-    expose:
+    ports:
       - "8080:8080"
     restart: always
