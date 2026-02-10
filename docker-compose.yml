@@ -1,5 +1,3 @@
-version: "3.7"
-
 services:
   securebank-proxy:
     container_name: securebank-proxy
