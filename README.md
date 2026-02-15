@@ -12,6 +12,11 @@
 
 ## Informations
 
+> [!Important]
+> **For Github users:**
+>
+> This is only mirror repository. All changes are first uploaded to the repository <a href="https://repos.mateuszskoczek.com/MateuszSkoczek/SecureBank">here</a>. Releases are also published on original repository. However, Github repository handles issues and pull requests for better accessibility.
+
 > [!IMPORTANT]  
 > App is no longer maintained, but should work properly
 
